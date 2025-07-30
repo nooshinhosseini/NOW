@@ -1,15 +1,19 @@
 import re
+from striprtf.striprtf import rtf_to_text
 
-# Load your text into this variable
-text = file 1.rtf
+# Read and convert RTF to plain text
+with open('file 1.rtf', 'r', encoding='utf-8') as f:
+    rtf_content = f.read()
 
-# Split the entries by their original markers (e.g., "#1:", "#2:", etc.)
-entries = re.split(r'#\d{1,3}:\s?', text)
+text = rtf_to_text(rtf_content)
 
-# Remove any empty strings
+# Split the entries by their markers
+entries = re.split(r'#\s*\d{1,3}:\s*', text)
+
+# Clean and filter entries
 entries = [entry.strip().replace('<br><br>', ' ') for entry in entries if entry.strip()]
 
-# Remove duplicates while preserving order
+# Remove duplicates
 seen = set()
 unique_entries = []
 for entry in entries:
@@ -17,9 +21,8 @@ for entry in entries:
         unique_entries.append(entry)
         seen.add(entry)
 
-# Re-number and format the cleaned entries
+# Reformat and output
 formatted_entries = [f"#{i+1}: {entry}" for i, entry in enumerate(unique_entries)]
 
-# Output result
 cleaned_text = '\n\n'.join(formatted_entries)
 print(cleaned_text)
